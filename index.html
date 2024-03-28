@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Luck Game</title>
+</head>
+<body>
+    <div class="container">
+      <video autoplay muted loop>
+        <source src="files/bg.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+        <div class="container1">
+            <h2>TOSS A COIN</h2>
+            <select id="tossCoin">
+                <option style="background-color: rgb(135, 158, 158);" value="heads">heads</option>
+                <option style="background-color: rgb(131, 151, 151);" value="tails">tails</option>
+            </select>
+            <button style="color: rgb(255, 255, 255);" onclick="tossCoin()">Toss Coin</button>
+            <p style="color: rgb(248, 248, 248);" id="output"></p>
+            <p style="color: rgb(255, 255, 255);" id="output2"></p>
+        </div>
+
+        <div class="container2">
+            <h2>PLAYER SIDE</h2>
+            <button id="attack" onclick="playerAttack()" disabled>Attack</button>
+            <button id="defend" onclick="playerDefend()" disabled>Defend</button>
+        </div>
+
+        <div class="container3">
+            <p id="output3"></p>
+            <p id="output4"></p>
+        </div>
+
+        <div class="container4">
+            <h2>HEALTH STATUS</h2>
+            <p id="hs"></p>
+            <p id="message"></p>
+            <button id="resetBtn" onclick="resetbtn()" disabled>Reset</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>2024 The Luck Game. All rights reserved.</p>
+    </div>
+<style>
+
+.footer {
+    background-color: rgba(51, 51, 51, 0.795)#333;
+    color: #ffffff;
+    text-align: center;
+    padding: 20px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 3vh;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family:cursive;
+    color: #fff;
+}
+
+.container {
+    overflow: hidden;
+}
+
+video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+.container1{
+    height: 60vh;
+    width:10vw;
+    position: relative;
+    right: -20vw;
+    top: 10vh;
+}
+
+.container2{
+    height: 20vh;
+    position: relative;
+    right: -80vw;
+    top: -40vh;
+}
+
+.container3{
+    height: 30vh;
+    width: 40vw;
+    position: relative;
+    right: -50vw;
+    bottom: 90vh;
+    font-size: large;
+}
+
+.container4{
+    height: 30vh;
+    width: 40vw;
+    position: relative;
+    right: -50vw;
+    bottom: 90vh;
+    font-size: large;
+}
+
+.container1, .container2, .container3, .container4 {
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 2px solid #fff;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    width: fit-content;
+    transform: translateX(-50%);
+    animation: grow-and-shrink 2000ms;
+    animation-timing-function: ease-in-out;
+    animation-direction: alternate;
+}
+
+.container1 h2, .container2 h2, .container4 h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #fd7c04;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    background-color: #314458;
+    color: #fff;
+    transition: background-color 0.5s, transform 0.5s;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+button:hover {
+    background-color: #fd7c04;
+    transform: scale(1.2);
+}
+
+select {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #fff;
+    background-color: #314458;
+    color: #fff;
+}
+
+select:hover {
+    background-color: #fd7c04;
+}
+
+#message {
+    font-size: larger;
+    color: #fd7c04;
+    font-style: italic;
+    text-align: center;
+    font-size: larger;
+}
+
+@keyframes grow-and-shrink {
+    0% {
+      transform: scale(0.5);
+    }
+    50% {
+      transform: scale(1);
+    }
+  }
+
+
+</style>
+    <script>
+        var PHP = 100;
+        var OHP = 100;
+
+        function tossCoin() {
+            const playerChoice = document.getElementById("tossCoin").value;
+            const tossCoinResult = Math.round(Math.random());
+            var tossCoinResultReadable;
+            if (tossCoinResult == 0) {
+                tossCoinResultReadable = "heads";
+            } else {
+                tossCoinResultReadable = "tails";
+            }
+            document.getElementById("output").innerHTML = "THE RESULT IS " + tossCoinResultReadable;
+            const didThePlayerWin = playerChoice == tossCoinResultReadable;
+            if (didThePlayerWin) {
+                document.getElementById("output2").innerHTML = "YOU take the FIRST move.";
+                document.getElementById('attack').disabled = false;
+                document.getElementById('defend').disabled = true;
+            } else {
+                document.getElementById("output2").innerHTML = "OPPONENT takes the FIRST move.";
+                document.getElementById('attack').disabled = false;
+                document.getElementById('defend').disabled = false;
+            }
+            updateHealthStatus();
+        }
+
+        function dmg() {
+            return Math.floor(Math.random() * 5) + 1;
+        }
+
+        function opponentAction() {
+            var def = Math.floor(Math.random() * 3) + 1;
+            var damage = dmg();
+            const opponentActionResult = Math.round(Math.random());
+            var action;
+            if (opponentActionResult == 0) {
+                action = "defend";
+                if (damage > def) {
+                    document.getElementById("output3").innerHTML = "You have inflicted " + damage + " damage.";
+                    OHP -= damage;
+                    checkHealth();
+                } else {
+                    document.getElementById("output3").innerHTML = "Opponent completely blocked the attack!";
+                }
+            } else if (opponentActionResult == 1) {
+                action = "attack";
+                document.getElementById("output3").innerHTML = "You have inflicted " + damage + " damage";
+                OHP -= damage;
+                checkHealth();
+            }
+            updateHealthStatus();
+        }
+
+        function playerAttack() {
+            document.getElementById("output3").innerHTML = "PLAYER ATTACKS";
+            damage = dmg();
+            document.getElementById("output4").innerHTML = " You have inflicted " + damage + " damage";
+            OHP -= damage;
+            updateHealthStatus();
+            checkHealth();
+            document.getElementById('defend').disabled = false;
+        }
+
+        function playerDefend() {
+            document.getElementById("output3").innerHTML = "PLAYER DEFENDS";
+            var def = Math.floor(Math.random() * 3) + 1;
+            var damage = dmg();
+            const opponentActionResult = Math.round(Math.random());
+            var action;
+            if (opponentActionResult == 0) {
+                action = "defend";
+                document.getElementById("output4").innerHTML = "OPPONENT DEFENDS";
+            } else if (opponentActionResult == 1) {
+                action = "attack";
+                if (damage > def) {
+                    document.getElementById("output4").innerHTML = "Opponent had inflicted " + damage + " damage";
+                    PHP -= damage;
+                    checkHealth();
+                } else {
+                    document.getElementById("output4").innerHTML = "You completely blocked the opponent";
+                }
+            }
+            updateHealthStatus();
+            document.getElementById('defend').disabled = false;
+        }
+
+        function updateHealthStatus() {
+            document.getElementById('hs').innerText = "Player Health: " + PHP + "\nOpponent Health: " + OHP;
+        }
+
+        function checkHealth() {
+            if (PHP <= 0) {
+                document.getElementById('message').innerText = 'Opponent wins.';
+                document.getElementById('attack').disabled = true;
+                document.getElementById('defend').disabled = true;
+                document.getElementById('resetBtn').disabled = false;
+            } else if (OHP <= 0) {
+                document.getElementById('message').innerText = 'Player wins.';
+                document.getElementById('attack').disabled = true;
+                document.getElementById('defend').disabled = true;
+                document.getElementById('resetBtn').disabled = false;
+            }
+        }
+
+        function resetbtn() {
+            PHP = 100;
+            OHP = 100;
+            coinResult = '';
+            document.getElementById('attack').disabled = false;
+            document.getElementById('defend').disabled = false;
+            document.getElementById('resetBtn').disabled = false;
+            document.getElementById("output").innerHTML = "";
+            document.getElementById("output2").innerHTML = "";
+            document.getElementById("output3").innerHTML = "";
+            document.getElementById("output4").innerHTML = "";
+            document.getElementById("hs").innerHTML = "";
+            document.getElementById("message").innerHTML = "";
+        }
+    </script>
+</body>
+</html>
